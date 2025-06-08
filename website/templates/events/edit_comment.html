@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="edit-comment-hero py-5 bg-tertiary text-light">
+    <div class="container text-center">
+        <h1 class="hero-title">Update Your Comment</h1>
+        <p class="hero-subtitle">Make changes to your feedback for "{{ event.name }}"</p>
+    </div>
+</div>
+
+<div class="container mt-5">
+    <div class="edit-comment-card p-4 rounded shadow-sm bg-secondary">
+        <div class="card-header bg-dark text-light rounded">
+            <h4>Modify Comment</h4>
+            <p class="mb-0">Adjust your thoughts and share your updated perspective.</p>
+        </div>
+        
+        <div class="card-body mt-3">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Original Comment -->
+            <div class="original-comment mb-4">
+                <h6>Previous Comment</h6>
+                <p class="original-comment-text bg-dark text-light p-3 rounded">{{ comment.text }}</p>
+            </div>
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="form-group mb-3">
+                    {{ form.text.label(class="form-label text-light") }}
+                    {{ form.text(class="form-control", rows="5", placeholder="Write your updated comment here...") }}
+                    {% if form.text.errors %}
+                        <div class="text-danger mt-1">
+                            {% for error in form.text.errors %}
+                                <small>{{ error }}</small><br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group d-flex justify-content-between">
+                    {{ form.submit(class="btn btn-primary") }}
+                    <a href="{{ url_for('event.details', id=event.id) }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

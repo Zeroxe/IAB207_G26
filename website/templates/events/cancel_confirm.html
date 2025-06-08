@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Event - {{ event.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10 col-lg-8">
+            <div class="confirmation-container">
+                <div class="confirmation-header bg-secondary text-light text-center py-4">
+                    <h2>Event Cancellation</h2>
+                </div>
+                <div class="confirmation-body p-4">
+                    {% if event %}
+                        <div class="text-center mb-4">
+                            <h4 class="text-warning">Do you want to proceed with canceling this event?</h4>
+                            <p class="text-muted">Event Name: <strong>{{ event.name }}</strong></p>
+                        </div>
+                        <p class="text-center">
+                            Once canceled, this event will no longer be available for bookings. Please confirm your decision carefully as this action cannot be reversed.
+                        </p>
+                        <form method="POST" action="{{ url_for('event.cancel_event_confirmed', id=event.id) }}" class="text-center mt-4">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <button type="submit" class="btn btn-primary px-4 py-2">Confirm Cancellation</button>
+                            <a href="{{ url_for('event.details', id=event.id) }}" class="btn btn-outline-secondary px-4 py-2 ms-3">Return to Event</a>
+                        </form>
+                    {% else %}
+                        <div class="alert alert-danger text-center">
+                            <p>Unable to load event details. Please try again later or contact support.</p>
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('main.index') }}" class="btn btn-primary px-4 py-2">Go to Homepage</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

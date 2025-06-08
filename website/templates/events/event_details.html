@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% from "bootstrap5/form.html" import render_form %}
+
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+{% if event %}
+<div class="event-hero position-relative text-white text-center py-5">
+  <div class="hero-overlay position-absolute w-100 h-100 top-0 start-0"></div>
+  <div class="container position-relative z-1">
+    <div class="bg-dark text-white p-4 rounded">
+      <h1 class="display-4 fw-bold mb-0">{{ event.name | default('Event Name Not Available') }}</h1>
+    </div>
+    <p class="lead mt-3">{{ event.genre_info.name if event.genre_info else 'Music Event' }}</p>
+  </div>
+</div>
+
+<div class="container my-5">
+  <div class="row g-4">
+    {% if event.image_filename %}
+    <div class="col-md-5">
+      <div class="card bg-dark text-white">
+        <img src="{{ event.image_filename if event.image_filename.startswith('http') else url_for('static', filename=event.image_filename) }}" class="card-img-top" alt="Event image">
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-{{ '7' if event.image_filename else '12' }}">
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card bg-dark text-white h-100">
+            <div class="card-header">
+              <h5 class="mb-0">Ticket Information</h5>
+            </div>
+            <div class="card-body">
+              {% if event.ticket_types.all() %}
+                {% for ticket in event.ticket_types %}
+                  <div class="mb-3">
+                    <h6 class="fw-semibold text-white">{{ ticket.type_name }} <span class="text-light float-end">${{ '%.2f'|format(ticket.price) }}</span></h6>
+                    <p class="mb-1 small">Available: {{ ticket.quantity_available }}</p>
+                    {% if ticket.description %}<p class="small text-light">{{ ticket.description }}</p>{% endif %}
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="text-light text-center">No ticket information available or event is free.</div>
+              {% endif %}
+
+              {% if current_user.is_authenticated %}
+                {% if event.current_status == 'Open' and event.ticket_types.all() %}
+                  <a href="{{ url_for('event.book_tickets', id=event.id) }}" class="btn btn-primary w-100 mt-3">Book Tickets</a>
+                {% else %}
+                  <button class="btn btn-secondary w-100 mt-3" disabled>
+                    {% if event.current_status == 'Cancelled' %}Event Cancelled
+                    {% elif event.current_status == 'Completed' %}Event Completed
+                    {% elif event.current_status == 'Inactive' %}Event Expired
+                    {% else %}Not Available{% endif %}
+                  </button>
+                {% endif %}
+              {% else %}
+                <a href="{{ url_for('auth.login', next=request.url) }}" class="btn btn-outline-light w-100 mt-3">Login to Book Tickets</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card bg-dark text-white h-100">
+            <div class="card-header">
+              <h5 class="mb-0">Event Details</h5>
+            </div>
+            <div class="card-body">
+              <ul class="list-unstyled">
+                <li><strong>Date & Time:</strong><br>{{ event.start_datetime.strftime('%A, %B %d, %Y at %I:%M %p') if event.start_datetime else 'N/A' }}</li>
+                <li class="mt-2"><strong>Location:</strong><br>{{ event.location | default('N/A') }}</li>
+                {% if event.venue %}
+                <li class="mt-2"><strong>Venue:</strong><br>{{ event.venue }}</li>
+                {% endif %}
+                {% if event.genre_info %}
+                <li class="mt-2"><strong>Genre:</strong><br>{{ event.genre_info.name }}</li>
+                {% endif %}
+                {% if event.age_limit is not none %}
+                <li class="mt-2"><strong>Age Limit:</strong><br>{{ event.age_limit }}{{ '+' if event.age_limit > 0 else ' (All ages)' }}</li>
+                {% endif %}
+                {% if event.length %}
+                <li class="mt-2"><strong>Duration:</strong><br>{{ event.length }}</li>
+                {% endif %}
+              </ul>
+              {% if event.artist_info %}
+              <hr>
+              <h6>Artist Information</h6>
+              <p>{{ event.artist_info }}</p>
+              {% endif %}
+              {% if event.description %}
+              <hr>
+              <h6>Event Description</h6>
+              <p>{{ event.description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if event.policies %}
+    <div class="mt-4">
+      <h5>Event Policies</h5>
+      <div class="bg-dark text-white p-3 rounded">{{ event.policies }}</div>
+    </div>
+  {% endif %}
+
+  {% if current_user.is_authenticated and event.created_by == current_user.id and event.current_status != 'Cancelled' %}
+    <div class="mt-5">
+      <h5>Event Management</h5>
+      <p class="text-muted">Manage your event settings and status:</p>
+      <a href="{{ url_for('event.edit_event', id=event.id) }}" class="btn btn-outline-primary me-2">Edit Event</a>
+      <a href="{{ url_for('event.cancel_confirm', id=event.id) }}" class="btn btn-outline-danger">Cancel Event</a>
+    </div>
+  {% endif %}
+
+  <div class="mt-5">
+    <h5>Comments ({{ event.comments.count() }})</h5>
+
+    {% if current_user.is_authenticated %}
+      <form method="POST" action="{{ url_for('event.comment', id=event.id) }}" class="mt-3">
+        {{ form.csrf_token }}
+        <div class="mb-3">
+          {{ form.text.label(class="form-label") }}
+          {{ form.text(class="form-control", rows=3, placeholder="Share your thoughts about this event...") }}
+          {% if form.text.errors %}
+            <div class="invalid-feedback d-block">
+              {% for error in form.text.errors %}<div>{{ error }}</div>{% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+      </form>
+    {% else %}
+      <div class="alert alert-info mt-3">Please <a href="{{ url_for('auth.login', next=request.url) }}">login</a> to post a comment.</div>
+    {% endif %}
+
+    {% if comments %}
+      <hr>
+      <h6 class="mt-4">Recent Comments</h6>
+      {% for comment_item in comments %}
+        <div class="border rounded p-3 mb-3">
+          <div class="d-flex justify-content-between">
+            <div><strong>{{ comment_item.user.firstName }} {{ comment_item.user.surname }}</strong></div>
+            <div class="text-muted small">
+              {{ comment_item.created_at.strftime('%Y-%m-%d %H:%M') }}
+              {% if comment_item.is_edited %}<em>(edited)</em>{% endif %}
+            </div>
+          </div>
+          <p class="mb-0 mt-2">{{ comment_item.text }}</p>
+          {% if current_user.is_authenticated and comment_item.user_id == current_user.id %}
+            <div class="mt-2">
+              <a href="{{ url_for('event.edit_comment', event_id=event.id, comment_id=comment_item.id) }}" class="btn btn-sm btn-outline-secondary me-2">Edit</a>
+              <form method="POST" action="{{ url_for('event.delete_comment', event_id=event.id, comment_id=comment_item.id) }}" class="d-inline">
+                {{ form.csrf_token }}
+                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="text-muted mt-3">No comments yet. Be the first to share your thoughts!</div>
+    {% endif %}
+  </div>
+</div>
+{% else %}
+<div class="container py-5 text-center">
+  <div class="alert alert-warning">
+    <h4>Event Not Found</h4>
+    <p>This event could not be located or has been removed.</p>
+    <a href="{{ url_for('event.allevents') }}" class="btn btn-primary mt-3">Back to Events</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

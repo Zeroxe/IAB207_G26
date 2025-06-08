@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+  <!-- Confirmation Hero Section -->
+  <div class="confirmation-hero">
+    <div class="container">
+      <div class="text-center">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h1 class="hero-title">Booking Confirmed!</h1>
+        <p class="hero-subtitle">Your tickets have been successfully booked</p>
+        <div class="checkout-steps mt-3">
+          <span class="checkout-step">Select Tickets</span>
+          <span class="checkout-step active">Booking Confirmed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Confirmation Details -->
+        <div class="confirmation-card">
+          <div class="text-center mb-4">
+            <h3><i class="fas fa-ticket-alt"></i> Order #{{ order.id }}</h3>
+            <p class="text-muted">
+              Booking Date:
+              {{ order.order_date.strftime('%B %d, %Y at %I:%M %p') }}
+            </p>
+          </div>
+
+          <!-- Event Information -->
+          <div class="info-section">
+            <div class="info-section-header">
+              <i class="fas fa-calendar-alt"></i> Event Details
+            </div>
+            <div class="info-content">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5>{{ event.name }}</h5>
+                  <p class="mb-1">
+                    <i class="fas fa-calendar"></i>
+                    {{ event.start_datetime.strftime('%A, %B %d, %Y') }}
+                  </p>
+                  <p class="mb-1">
+                    <i class="fas fa-clock"></i>
+                    {{ event.start_datetime.strftime('%I:%M %p') }}
+                  </p>
+                  <p class="mb-1">
+                    <i class="fas fa-map-marker-alt"></i> {{ event.location }}
+                  </p>
+                </div>
+                <div class="col-md-6">
+                  {% if event.venue %}
+                    <p class="mb-1">
+                      <i class="fas fa-building"></i> {{ event.venue }}
+                    </p>
+                  {% endif %}
+
+                  {% if event.genre_info %}
+                    <p class="mb-1">
+                      <i class="fas fa-music"></i> {{ event.genre_info.name }}
+                    </p>
+                  {% endif %}
+
+                  {% if event.age_limit %}
+                    <p class="mb-1">
+                      <i class="fas fa-user-check"></i> {{ event.age_limit }}+ only
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ticket Details -->
+          <div class="info-section">
+            <div class="info-section-header">
+              <i class="fas fa-ticket-alt"></i> Your Tickets
+            </div>
+            <div class="info-content">
+              {% for item in order_items %}
+                <div class="ticket-item">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <h6 class="mb-1">{{ item.ticket_type_name }}</h6>
+                      <small class="text-muted">Quantity: {{ item.quantity }}</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                      <span class="detail-value">
+                        ${{ "%.2f"|format(item.unit_price) }} each
+                      </span>
+                    </div>
+                    <div class="col-md-3 text-end">
+                      <strong class="fs-5">
+                        ${{ "%.2f"|format(item.subtotal) }}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+
+              <div class="order-details-card">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>${{ "%.2f"|format(order.total_amount) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Service Fee:</span>
+                  <span>$0.00</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between">
+                  <strong class="fs-5">Total Paid:</strong>
+                  <strong class="fs-4">
+                    ${{ "%.2f"|format(order.total_amount) }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Important Information -->
+          <div class="important-note">
+            <h6>
+              <i class="fas fa-exclamation-triangle"></i> Important Information
+            </h6>
+            <ul class="mb-0">
+              {% if event.age_limit %}
+                <li>
+                  This event is {{ event.age_limit }}+ only – ID will be checked at entry
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="text-center mt-4">
+            <a
+              href="{{ url_for('main.booking_history') }}"
+              class="btn-action btn-primary-action"
+            >
+              <i class="fas fa-history"></i> View All Bookings
+            </a>
+            <a
+              href="{{ url_for('event.details', id=event.id) }}"
+              class="btn-action"
+            >
+              <i class="fas fa-eye"></i> View Event Details
+            </a>
+            <a
+              href="{{ url_for('event.allevents') }}"
+              class="btn-action"
+            >
+              <i class="fas fa-calendar"></i> Browse More Events
+            </a>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="info-section">
+          <div class="info-section-header">
+            <i class="fas fa-phone"></i> Need Help?
+          </div>
+          <div class="info-content text-center">
+            <p>If you have any questions about your booking please contact us:</p>
+            <p>
+              <strong>Email:</strong> YourMother@umart.com<br>
+              <strong>Phone:</strong> (61) 123-4567<br>
+              <strong>Hours:</strong> Monday - Tuesday 4pm to 5pm
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% from "bootstrap5/form.html" import render_form %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="event-hero position-relative text-white text-center py-5">
+  <div class="hero-overlay position-absolute w-100 h-100 top-0 start-0"></div>
+  <div class="container position-relative z-1">
+    <div class="bg-dark text-white p-4 rounded">
+      <h1 class="display-4 fw-bold mb-0">Edit Event</h1>
+    </div>
+    <p class="lead mt-3">Update your event details below</p>
+  </div>
+</div>
+
+<div class="show-creation-container">
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.csrf_token }}
+        <div class="row">
+            <div class="col-lg-8 mb-4">
+                <div class="card bg-dark text-white">
+                    <div class="card-header">
+                        <h5><i class="fas fa-calendar-plus"></i> Event Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Basic Info -->
+                        <div class="mb-4">
+                            <h6 class="section-title mb-3"><i class="fas fa-info-circle"></i> Basic Information</h6>
+                            {{ form.name.label(class="form-label") }}
+                            {{ form.name(class="form-control mb-3", placeholder="Event name...") }}
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.name.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ form.description.label(class="form-label") }}
+                            {{ form.description(class="form-control mb-3", rows="4", placeholder="Event description...") }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.description.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ form.genre.label(class="form-label") }}
+                            {{ form.genre(class="form-control mb-3") }}
+                            {% if form.genre.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.genre.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <!-- Date & Location -->
+                        <div class="mb-4">
+                            <h6 class="section-title mb-3"><i class="fas fa-map-marker-alt"></i> When & Where</h6>
+                            {{ form.start_datetime.label(class="form-label") }}
+                            {{ form.start_datetime(class="form-control mb-3") }}
+                            {% if form.start_datetime.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.start_datetime.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.location.label(class="form-label") }}
+                                    {{ form.location(class="form-control mb-3", placeholder="e.g., 123 Music St, Brisbane") }}
+                                    {% if form.location.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.location.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.venue.label(class="form-label") }}
+                                    {{ form.venue(class="form-control mb-3") }}
+                                    {% if form.venue.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.venue.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Event Image -->
+                        <div class="mb-4">
+                            <h6 class="section-title mb-3"><i class="fas fa-image"></i> Event Image</h6>
+                            {% if event.image_filename %}
+                                <img src="{{ event.image_filename if event.image_filename.startswith('http') else url_for('static', filename=event.image_filename) }}" alt="Event Image" class="img-fluid mb-3 rounded" style="max-height: 300px;">
+                            {% endif %}
+                            {{ form.image.label(class="form-label") }}
+                            {{ form.image(class="form-control mb-2") }}
+                            {% if form.image.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.image.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="helper-text">JPG, PNG, JPEG, and WEBP files only. This will be the main image for your event.</div>
+                        </div>
+                        <!-- Additional Details -->
+                        <div class="mb-4">
+                            <h6 class="section-title mb-3"><i class="fas fa-cogs"></i> Additional Details</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.age_limit.label(class="form-label") }}
+                                    {{ form.age_limit(class="form-control mb-3", placeholder="0 for all ages") }}
+                                    {% if form.age_limit.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.age_limit.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.length.label(class="form-label") }}
+                                    {{ form.length(class="form-control mb-3", placeholder="e.g., 2 hours, All day") }}
+                                    {% if form.length.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.length.errors %}{{ error }}{% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {{ form.artist_info.label(class="form-label") }}
+                            {{ form.artist_info(class="form-control mb-3", rows="3", placeholder="Tell us about the artists performing...") }}
+                            {% if form.artist_info.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.artist_info.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ form.policies.label(class="form-label") }}
+                            {{ form.policies(class="form-control mb-3", rows="3", placeholder="Event policies, rules, what to bring, etc...") }}
+                            {% if form.policies.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.policies.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Ticket Types Section -->
+            <div class="col-lg-4 mb-4">
+                <div class="card bg-dark text-white">
+                    <div class="card-header">
+                        <h5><i class="fas fa-ticket-alt"></i> Ticket Types & Pricing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <small>Define ticket types for your event. If you set a price, you must also set a quantity limit.</small>
+                        </div>
+                        <!-- General Tickets -->
+                        <div class="mb-4">
+                            <h6 class="ticket-type-title mb-2"><i class="fas fa-users"></i> General Admission</h6>
+                            {{ ticketform.general_price.label(class="form-label") }}
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">$</span>
+                                {{ ticketform.general_price(class="form-control", placeholder="0.00") }}
+                            </div>
+                            {% if ticketform.general_price.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in ticketform.general_price.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ ticketform.general_quantity.label(class="form-label") }}
+                            {{ ticketform.general_quantity(class="form-control mb-2", placeholder="How many tickets?") }}
+                            {% if ticketform.general_quantity.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in ticketform.general_quantity.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ ticketform.general_description.label(class="form-label") }}
+                            {{ ticketform.general_description(class="form-control mb-2", rows="2", placeholder="Describe this ticket type...") }}
+                        </div>
+                        <!-- VIP Tickets -->
+                        <div>
+                            <h6 class="ticket-type-title mb-2"><i class="fas fa-crown"></i> VIP Experience</h6>
+                            {{ ticketform.vip_price.label(class="form-label") }}
+                            <div class="input-group mb-2">
+                                <span class="input-group-text">$</span>
+                                {{ ticketform.vip_price(class="form-control", placeholder="0.00") }}
+                            </div>
+                            {% if ticketform.vip_price.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in ticketform.vip_price.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ ticketform.vip_quantity.label(class="form-label") }}
+                            {{ ticketform.vip_quantity(class="form-control mb-2", placeholder="How many VIP tickets?") }}
+                            {% if ticketform.vip_quantity.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in ticketform.vip_quantity.errors %}{{ error }}{% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ ticketform.vip_description.label(class="form-label") }}
+                            {{ ticketform.vip_description(class="form-control mb-2", rows="2", placeholder="Describe this ticket type...") }}
+                        </div>
+                        <div class="helper-text text-center mt-3">
+                            <i class="fas fa-lightbulb"></i>
+                            Leave price and quantity empty if you don't want to offer that ticket type.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Submit Section -->
+        <div class="submit-section text-center mt-4">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+            <a href="{{ url_for('event.allevents') }}" class="btn btn-secondary ms-2">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

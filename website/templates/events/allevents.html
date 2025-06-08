@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+<div class="booking-hero py-5">
+  <div class="container text-center">
+    <h1 class="hero-title">Explore Upcoming Events</h1>
+    <p class="hero-subtitle">Discover events happening near you</p>
+  </div>
+</div>
+
+<div class="container mt-5">
+  {% if events %}
+    <div class="row g-4 mt-2 mb-5 pb-5">
+      {% for event in events %}
+        <div class="col-lg-4 col-md-6">
+          <div class="card bg-dark text-white h-100">
+            {% if event.image_filename %}
+              <div class="position-relative p-2">
+                {% if event.image_filename.startswith('http') %}
+                  <img src="{{ event.image_filename }}" alt="{{ event.name }} Image" class="card-img-top rounded-top">
+                {% else %}
+                  <img src="{{ url_for('static', filename=event.image_filename) }}" alt="{{ event.name }} Image" class="card-img-top rounded-top">
+                {% endif %}
+                <div class="position-absolute p-1">
+                  <span class="event-status {{ event.current_status.lower().replace(' ', '-') }}">
+                    {% if event.current_status == 'Open' %}
+                      Open for Booking
+                    {% elif event.current_status == 'Sold Out' %}
+                      Sold Out
+                    {% elif event.current_status == 'Cancelled' %}
+                      Cancelled
+                    {% elif event.current_status == 'Inactive' %}
+                      Inactive
+                    {% else %}
+                      {{ event.current_status }}
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+            {% endif %}
+            <div class="card-body p-4">
+              <h5 class="card-title">{{ event.name }}</h5>
+              {% if event.genre_info %}
+                <div class="mb-2">
+                  Genre: {{ event.genre_info.name }}
+                </div>
+              {% endif %}
+              <div>
+                Date: {{ event.start_datetime.strftime('%d/%m/%Y') }}
+                <span class="ms-3">Time: {{ event.start_datetime.strftime('%I:%M %p') }}</span>
+              </div>
+              {% if event.location %}
+                <div class="mb-3">
+                  Location: {{ event.location }}
+                </div>
+              {% endif %}
+              {% if event.description %}
+                <p class="card-text text-muted mb-3">
+                  {{ event.description[:100] }}{% if event.description|length > 100 %}...{% endif %}
+                </p>
+              {% endif %}
+              <a href="{{ url_for('event.details', id=event.id) }}" class="btn btn-primary w-100">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="no-events text-center mt-5">
+      <h3 class="mt-3">No Events Found</h3>
+      {% if selected_genre %}
+        <p class="text-muted">No events found for the genre <strong>{{ selected_genre }}</strong>.</p>
+        <a href="{{ url_for('event.allevents') }}" class="btn btn-primary mt-3">
+          View All Events
+        </a>
+      {% else %}
+        <p class="text-muted">Currently, there are no events available.</p>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('event.create') }}" class="btn btn-primary mt-3">
+            Create Your First Event
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% from "bootstrap5/form.html" import render_form %}
+{% block head %} {{ super() }}
+{% endblock %} {% block content %}
+<section class="login-section">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- LEFT PANEL: Logo + Form -->
+      <div class="col-sm-6 text-white">
+        <div
+          class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 pt-5 pt-xl-0 mt-xl-n5"
+        >
+          <form method="post" style="width: 25rem">
+            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px">
+              {{ heading }}
+            </h3>
+
+            {{ form.hidden_tag() }}
+            {{ render_form(form) }}
+
+            {% if heading == 'Login' %}
+            <p class="mb-3 mt-3">
+              Don’t have an account?
+              <a href="{{ url_for('auth.register') }}" class="link-info">
+                Register here
+              </a>
+            </p>
+            {% else %}
+            <p class="mb-3 mt-3">
+              Already have an account?
+              <a href="{{ url_for('auth.login') }}" class="link-info">
+                Login here
+              </a>
+            </p>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Full‐height Image -->
+      <div class="col-sm-6 px-0 d-none d-sm-block">
+        <img
+          src="{{ url_for('static', filename='images/login_register_splash.jpg') }}"
+          alt="Login image"
+          class="w-100 vh-100"
+          style="object-fit: cover; object-position: left"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

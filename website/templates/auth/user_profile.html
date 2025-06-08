@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="user-profile-section">
+  <div class="container py-5">
+
+    <div class="row">
+      <div class="col-lg-4 mb-4">
+        <div class="profile-card p-4 shadow-sm">
+          <div class="profile-image mb-3">
+            <div class="image-container">
+              <span class="user-placeholder">{{ current_user.firstName[0] }}{{ current_user.surname[0] }}</span>
+            </div>
+          </div>
+          <h5 class="profile-name mb-2">{{ current_user.firstName }} {{ current_user.surname }}</h5>
+          <p class="profile-role mb-2">Registered User</p>
+          <p class="profile-address">{{ current_user.streetAddress }}</p>
+        </div>
+
+        <div class="details-card p-4 shadow-sm mt-4">
+          <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <h5 class="form-title mb-3">User Details</h5>
+            <div class="form-group mb-3">
+              <label for="{{ form.firstName.id }}">Name</label>
+              {{ form.firstName(class="form-control") }}
+            </div>
+            <div class="form-group mb-3">
+              <label for="{{ form.surname.id }}">Surname</label>
+              {{ form.surname(class="form-control") }}
+            </div>
+            <div class="form-group mb-3">
+              <label for="{{ form.email.id }}">Email</label>
+              {{ form.email(class="form-control") }}
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-8">
+        <div class="options-card p-4 shadow-sm mb-4">
+          <h5 class="form-title mb-3">Quick Access</h5>
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <a href="{{ url_for('main.booking_history') }}" class="btn btn-primary w-100">My Order History</a>
+            </div>
+            <div class="col-md-4 mb-3">
+              <a href="{{ url_for('event.create') }}" class="btn btn-info w-100">Create New Event</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-card p-4 shadow-sm">
+          <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <h5 class="form-title mb-3">Contact Details</h5>
+            <div class="form-group mb-3">
+              <label for="{{ form.mobileNumber.id }}">Contact Number</label>
+              {{ form.mobileNumber(class="form-control") }}
+            </div>
+            <div class="form-group mb-3">
+              <label for="{{ form.streetAddress.id }}">Residential Address</label>
+              {{ form.streetAddress(class="form-control") }}
+            </div>
+            <div class="form-actions mt-3">
+              <a href="{{ url_for('main.booking_history') }}" class="btn btn-secondary">Cancel</a>
+              {{ form.submit(class="btn btn-primary") }}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

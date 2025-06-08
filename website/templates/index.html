@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block head %}
+    {{ super() }}
+{% endblock %}
+
+{% block header %}
+<!-- HERO SECTION -->
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <form method="GET" action="{{ url_for('event.allevents') }}" class="mt-4">
+    <div class="input-group input-group-lg w-100">
+      <input
+        id="hero-search"
+        type="text"
+        name="search"
+        value="{{ search_text }}"
+        class="form-control"
+        placeholder="Search events artists, venues, or genres"
+        aria-label="Search events"
+      >
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </form>
+</div>
+<main>
+    <section class="section-upcoming">
+        <div class="container my-5">
+            <h2 class="text-center text-white mb-4">Upcoming Events</h2>
+            {% if events %}
+                <div class="row g-4">
+                    {% for event_item in events %}
+                    <div class="col-lg-4 col-md-6">
+                        <a href="{{ url_for('event.details', id=event_item.id) }}" class="text-decoration-none">
+                            <div class="card bg-dark text-white h-100">
+                                {% if event_item.image_filename %}
+                                    {% if event_item.image_filename.startswith('http') %}
+                                        <img src="{{ event_item.image_filename }}" alt="{{ event_item.name }} Image" class="card-img-top rounded-top">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename=event_item.image_filename) }}" alt="{{ event_item.name }} Image" class="card-img-top rounded-top">
+                                    {% endif %}
+                                {% else %}
+                                    <img src="{{ url_for('static', filename='img/grey.jpg') }}" alt="Placeholder Image" class="card-img-top rounded-top">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event_item.name }}</h5>
+                                    <div class="mb-2">
+                                        <span class="badge bg-secondary">{{ event_item.genre_info.name if event_item.genre_info else 'Music Event' }}</span>
+                                        <span class="badge bg-info">{{ event_item.start_datetime.strftime('%d %b %Y') }}</span>
+                                    </div>
+                                    <p class="card-text text-muted mb-2">{{ event_item.description | truncate(100) }}</p>
+                                    <div>
+                                        <i class="fas fa-calendar-alt"></i> {{ event_item.start_datetime.strftime('%d/%m/%Y') if event_item.start_datetime else 'N/A' }}
+                                        <span class="ms-3"><i class="fas fa-clock"></i> {{ event_item.start_datetime.strftime('%I:%M %p') if event_item.start_datetime else '' }}</span>
+                                    </div>
+                                    {% if event_item.venue %}
+                                    <div>
+                                        <i class="fas fa-map-marker-alt"></i> {{ event_item.venue }}
+                                    </div>
+                                    {% endif %}
+                                    <span class="btn btn-outline-primary mt-3 w-100">View Details</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center mt-5">
+                    No upcoming events found.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+{% endblock %}
